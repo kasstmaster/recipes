@@ -1,6 +1,6 @@
 let editMode = false;
 let recipes = [];
-const dataPath = "recipes.json";
+const dataPath = "recipes.json"; // ✅ Path is correct for your structure
 
 // ✅ Global category list for homepage
 let categoryList = [
@@ -28,8 +28,14 @@ function formatCategory(name) {
 
 // ✅ Fetch recipes from JSON
 async function fetchRecipes() {
-  const response = await fetch(dataPath);
-  recipes = await response.json();
+  try {
+    const response = await fetch(dataPath);
+    if (!response.ok) throw new Error("Failed to load recipes.json");
+    recipes = await response.json();
+  } catch (err) {
+    console.error("Error fetching recipes:", err);
+    recipes = []; // ✅ Fallback to empty list
+  }
   return recipes;
 }
 
@@ -51,7 +57,6 @@ function loadCategories() {
 
     if (editMode) {
       card.classList.add("edit-mode");
-
       const deleteBtn = document.createElement("button");
       deleteBtn.className = "delete-btn";
       deleteBtn.textContent = "✖";
@@ -61,7 +66,6 @@ function loadCategories() {
       };
       card.appendChild(deleteBtn);
     } else {
-      card.classList.remove("edit-mode");
       card.onclick = () =>
         (window.location.href = `recipes.html?category=${encodeURIComponent(cat)}`);
     }
@@ -84,7 +88,6 @@ async function loadRecipes() {
   await fetchRecipes();
   const container = document.getElementById("recipe-list");
 
-  // ✅ Internal function to render recipe cards
   function display() {
     container.innerHTML = "";
     recipes.forEach((recipe, index) => {
@@ -100,7 +103,7 @@ async function loadRecipes() {
           editBtn.textContent = "Edit";
           editBtn.onclick = (e) => {
             e.stopPropagation();
-            editRecipe(index);
+            editRecipe(index, display);
           };
 
           const deleteBtn = document.createElement("button");
@@ -125,15 +128,68 @@ async function loadRecipes() {
   }
 
   display();
+  attachCommonEvents(display, container, "search");
+}
 
-  // ✅ Search filter
-  const searchInput = document.getElementById("search");
+/* -------------------------------
+   ALL RECIPES PAGE
+--------------------------------- */
+async function loadAllRecipes() {
+  await fetchRecipes();
+  const container = document.getElementById("all-recipe-list");
+
+  function display() {
+    container.innerHTML = "";
+    recipes.forEach((recipe, index) => {
+      const card = document.createElement("div");
+      card.className = "recipe-card";
+      card.innerHTML = `<span>${recipe.title}</span>`;
+
+      if (editMode) {
+        card.style.justifyContent = "space-between";
+
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          editRecipe(index, display);
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "✖";
+        deleteBtn.className = "delete-btn";
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
+          recipes.splice(index, 1);
+          display();
+        };
+
+        card.appendChild(editBtn);
+        card.appendChild(deleteBtn);
+      } else {
+        card.onclick = () =>
+          (window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`);
+      }
+
+      container.appendChild(card);
+    });
+  }
+
+  display();
+  attachCommonEvents(display, container, "searchAll");
+}
+
+/* -------------------------------
+   COMMON EVENTS (Search + Toggle + Add)
+--------------------------------- */
+function attachCommonEvents(display, container, searchId) {
+  const searchInput = document.getElementById(searchId);
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       const term = e.target.value.toLowerCase();
       container.innerHTML = "";
       recipes
-        .filter(r => r.title.toLowerCase().includes(term) && r.category.toLowerCase() === category.toLowerCase())
+        .filter(r => r.title.toLowerCase().includes(term))
         .forEach((recipe) => {
           const card = document.createElement("div");
           card.className = "recipe-card";
@@ -143,18 +199,16 @@ async function loadRecipes() {
     });
   }
 
-  // ✅ Toggle Edit Mode (Fixed)
   const toggleBtn = document.getElementById("toggleEditModeBtn");
   if (toggleBtn) {
     toggleBtn.addEventListener("click", () => {
       editMode = !editMode;
       document.getElementById("editPanel").style.display = editMode ? "block" : "none";
       toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Recipes";
-      display(); // ✅ Refresh recipe cards to show/hide buttons
+      display();
     });
   }
 
-  // ✅ Add new recipe
   const addForm = document.getElementById("addRecipeForm");
   if (addForm) {
     addForm.addEventListener("submit", (e) => {
@@ -178,20 +232,23 @@ async function loadRecipes() {
       }
     });
   }
+}
 
-  // ✅ Export JSON
-  const exportBtn = document.getElementById("exportBtn");
-  if (exportBtn) {
-    exportBtn.addEventListener("click", () => {
-      const exportArea = document.getElementById("exportData");
-      exportArea.style.display = "block";
-      exportArea.value = JSON.stringify(recipes, null, 2);
-    });
+/* -------------------------------
+   EDIT RECIPE FUNCTION
+--------------------------------- */
+function editRecipe(index, callback) {
+  const newTitle = prompt("Enter new title:", recipes[index].title);
+  const newCategory = prompt("Enter new category:", recipes[index].category);
+  if (newTitle && newCategory) {
+    recipes[index].title = newTitle.trim();
+    recipes[index].category = newCategory.trim();
+    callback(); // ✅ Keeps Edit Mode ON
   }
 }
 
 /* -------------------------------
-   RECIPE PAGE: LOAD SINGLE RECIPE
+   RECIPE PAGE
 --------------------------------- */
 async function loadRecipeDetails() {
   const params = new URLSearchParams(window.location.search);
@@ -203,7 +260,7 @@ async function loadRecipeDetails() {
     const container = document.getElementById("recipe-details");
     document.getElementById("recipe-title").innerText = recipe.title;
     container.innerHTML = `
-      ${recipe.photo ? `<img src="../data/${recipe.photo}" alt="${recipe.title}" style="max-width:100%; margin-bottom:10px;">` : ""}
+      ${recipe.photo ? `<img src="${recipe.photo}" alt="${recipe.title}" style="max-width:100%; margin-bottom:10px;">` : ""}
       <h2>Ingredients</h2>
       <ul>${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
       <h2>Instructions</h2>
@@ -216,19 +273,6 @@ async function loadRecipeDetails() {
   const printBtn = document.getElementById("printBtn");
   if (printBtn) {
     printBtn.addEventListener("click", () => window.print());
-  }
-}
-
-/* -------------------------------
-   EDIT RECIPE FUNCTION
---------------------------------- */
-function editRecipe(index) {
-  const newTitle = prompt("Enter new title:", recipes[index].title);
-  const newCategory = prompt("Enter new category:", recipes[index].category);
-  if (newTitle && newCategory) {
-    recipes[index].title = newTitle.trim();
-    recipes[index].category = newCategory.trim();
-    loadRecipes();
   }
 }
 
@@ -257,15 +301,6 @@ document.addEventListener("DOMContentLoaded", () => {
           document.getElementById("newCategory").value = "";
           loadCategories();
         }
-      });
-    }
-
-    const exportBtn = document.getElementById("exportBtn");
-    if (exportBtn) {
-      exportBtn.addEventListener("click", () => {
-        const exportArea = document.getElementById("exportData");
-        exportArea.style.display = "block";
-        exportArea.value = JSON.stringify({ categories: categoryList }, null, 2);
       });
     }
 
