@@ -29,10 +29,17 @@ async function loadAllRecipes() {
     recipes.forEach((recipe, index) => {
       const card = document.createElement("div");
       card.className = "recipe-card";
-      card.innerHTML = `<span>${recipe.title}</span>`;
+
+      // ✅ Title on the left
+      const titleSpan = document.createElement("span");
+      titleSpan.textContent = recipe.title;
+      card.appendChild(titleSpan);
 
       if (editMode) {
-        card.style.justifyContent = "space-between";
+        // ✅ Buttons container on the far right
+        const btnContainer = document.createElement("div");
+        btnContainer.style.display = "flex";
+        btnContainer.style.gap = "10px";
 
         const editBtn = document.createElement("button");
         editBtn.textContent = "Edit";
@@ -50,9 +57,11 @@ async function loadAllRecipes() {
           display();
         };
 
-        card.appendChild(editBtn);
-        card.appendChild(deleteBtn);
+        btnContainer.appendChild(editBtn);
+        btnContainer.appendChild(deleteBtn);
+        card.appendChild(btnContainer);
       } else {
+        // ✅ Normal click opens recipe detail
         card.onclick = () =>
           (window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`);
       }
