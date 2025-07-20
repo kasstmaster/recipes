@@ -10,15 +10,17 @@
 <body>
 <header>
   <h1 id="recipe-title"></h1>
-  <button id="printBtn" style="margin:20px; padding:10px;">Print Recipe</button>
-  <button onclick="window.location.href='index.html'"  style="margin:20px; padding:10px;">Home</button>
+  <div style="margin-top:10px;">
+    <button id="printBtn" style="margin:10px; padding:10px;">Print Recipe</button>
+    <button onclick="window.location.href='index.html'" style="margin:10px; padding:10px;">Home</button>
+  </div>
 </header>
 
 <main id="recipe-details" class="recipe-details"></main>
 
 <script src="script.js"></script>
 <script>
-  loadRecipeDetails();
+  document.addEventListener("DOMContentLoaded", loadRecipeDetails);
 </script>
 </body>
 </html>
