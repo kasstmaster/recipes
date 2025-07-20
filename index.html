@@ -24,7 +24,6 @@
     <h2>Edit Mode Active</h2>
     <form id="addRecipeForm" style="display:flex; gap:10px; flex-wrap:wrap;">
       <input type="text" id="newRecipeTitle" placeholder="Recipe Title" required>
-      <input type="text" id="newRecipeCategory" placeholder="Category" required>
       <button type="submit">Add Recipe</button>
     </form>
   </div>
@@ -33,7 +32,7 @@
 <script src="script.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    loadAllRecipes(); // ✅ Uses the new function from updated script.js
+    loadAllRecipes(); // ✅ Now works with simplified script.js
   });
 </script>
 </body>
