@@ -95,20 +95,21 @@ button:hover {
 .recipe-card {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between; /* Ensures text is on left and buttons on right */
   background: #fff;
-  padding: 20px;
+  padding: 15px;
   border-bottom: 1px solid #ddd;
   font-size: 1.2rem;
   cursor: pointer;
-  width: 100%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   position: relative;
-  margin: 0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
-.recipe-card:last-child {
-  border-bottom: none;
+.recipe-card span {
+  flex: 1; /* Pushes buttons to the right */
+  text-align: left;
+}
+.recipe-card button {
+  margin-left: 10px; /* Space between buttons */
 }
 
 /* ✅ Print-Friendly */
