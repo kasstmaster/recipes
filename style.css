@@ -67,7 +67,7 @@ h1 {
   margin-top: 15px;
 }
 
-#newCategory {
+#newCategory, #newRecipeTitle, #newRecipeCategory {
   flex: 1;
   padding: 10px;
   font-size: 1rem;
