@@ -59,7 +59,7 @@ h1 {
 }
 
 /* ✅ Add Category Form */
-#addCategoryForm {
+#addCategoryForm, #addRecipeForm {
   display: flex;
   flex-direction: row;
   gap: 10px;
