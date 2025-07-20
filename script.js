@@ -1,6 +1,6 @@
 let editMode = false;
 let recipes = [];
-const dataPath = "../data/recipes.json";
+const dataPath = "recipes.json";
 
 // ✅ Global category list for homepage
 let categoryList = [
