@@ -94,25 +94,30 @@ async function loadRecipes() {
     list.forEach((recipe, index) => {
       if (recipe.category && recipe.category.toLowerCase() === category.toLowerCase()) {
         const card = document.createElement("div");
-        card.className = "recipe-card";
+        card.className = "recipe-card"; // ✅ Consistent with CSS
         card.innerHTML = `<span>${recipe.title}</span>`;
 
         if (editMode) {
+          // ✅ Add edit and delete buttons for Edit Mode
           const editBtn = document.createElement("button");
           editBtn.textContent = "Edit";
           editBtn.style.marginLeft = "10px";
           editBtn.onclick = () => editRecipe(index);
+
           const deleteBtn = document.createElement("button");
           deleteBtn.textContent = "✖";
-          deleteBtn.style.marginLeft = "5px";
+          deleteBtn.className = "delete-btn"; // ✅ Match category delete button styling
           deleteBtn.onclick = () => {
             recipes.splice(index, 1);
             display(recipes);
           };
+
           card.appendChild(editBtn);
           card.appendChild(deleteBtn);
         } else {
-          card.onclick = () => window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`;
+          // ✅ Normal click goes to recipe details page
+          card.onclick = () =>
+            window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`;
         }
 
         container.appendChild(card);
@@ -122,7 +127,7 @@ async function loadRecipes() {
 
   display(recipes);
 
-  // ✅ Search
+  // ✅ Search filter
   const searchInput = document.getElementById("search");
   if (searchInput) {
     searchInput.addEventListener("input", e => {
@@ -130,6 +135,53 @@ async function loadRecipes() {
       display(recipes.filter(r => r.title.toLowerCase().includes(term)));
     });
   }
+
+  // ✅ Toggle Edit Mode functionality
+  const toggleBtn = document.getElementById("toggleEditModeBtn");
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      editMode = !editMode;
+      document.getElementById("editPanel").style.display = editMode ? "block" : "none";
+      toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Recipes";
+      display(recipes); // ✅ Refresh list to show/hide buttons
+    });
+  }
+
+  // ✅ Handle Add Recipe form
+  const addForm = document.getElementById("addRecipeForm");
+  if (addForm) {
+    addForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("newRecipeTitle").value.trim();
+      const cat = document.getElementById("newRecipeCategory").value.trim();
+      if (title && cat) {
+        recipes.push({
+          title,
+          category: cat,
+          ingredients: [],
+          instructions: [],
+          notes: "",
+          story: "",
+          photo: "",
+          tags: []
+        });
+        document.getElementById("newRecipeTitle").value = "";
+        document.getElementById("newRecipeCategory").value = "";
+        display(recipes);
+      }
+    });
+  }
+
+  // ✅ Export Updated Recipes
+  const exportBtn = document.getElementById("exportBtn");
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+      const exportArea = document.getElementById("exportData");
+      exportArea.style.display = "block";
+      exportArea.value = JSON.stringify(recipes, null, 2);
+    });
+  }
+}
 
   // ✅ Toggle Edit Mode
   const toggleBtn = document.getElementById("toggleEditModeBtn");
