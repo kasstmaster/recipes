@@ -1,3 +1,6 @@
+* {
+  box-sizing: border-box;
+}
 body {
   font-family: 'Roboto', sans-serif;
   background: #f9f4ee;
@@ -90,7 +93,7 @@ button:hover {
   display: flex;
   flex-direction: column;
   padding: 0;
-  gap: 0; /* No space between */
+  margin: 0;
 }
 
 /* ✅ Recipe cards in grid layout */
