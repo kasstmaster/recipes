@@ -50,13 +50,27 @@ h1 {
 }
 
 /* ✅ Search bars */
-#search, #searchAll, #newCategory {
+#search, #searchAll {
   margin: 15px auto;
   display: block;
   padding: 10px;
   width: 80%;
   font-size: 1rem;
 }
+
+#addCategoryForm {
+  display: flex;
+  flex-direction: row;
+  gap: 10px; /* Space between input and button */
+  justify-content: center; /* Center them horizontally */
+  margin-top: 15px;
+}
+#newCategory {
+  flex: 1; /* Input takes full available width */
+  padding: 10px;
+  font-size: 1rem;
+}
+
 
 /* ✅ Buttons */
 button {
