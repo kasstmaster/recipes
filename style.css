@@ -7,7 +7,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* ✅ Forces no horizontal scroll */
+  overflow-x: hidden;
   width: 100%;
 }
 
@@ -33,8 +33,8 @@ h1 {
 /* ✅ Recipe grid layout for category pages */
 .recipe-grid {
   display: grid;
-  gap: 15px;
-  padding: 20px;
+  gap: 0; /* ✅ No gaps since cards have dividers now */
+  padding: 0;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 
@@ -62,19 +62,20 @@ h1 {
 #addCategoryForm {
   display: flex;
   flex-direction: row;
-  gap: 10px; /* Space between input and button */
-  justify-content: center; /* Center them horizontally */
+  gap: 10px;
+  justify-content: center;
   margin-top: 15px;
 }
+
 #newCategory {
-  flex: 1; /* Input takes full available width */
+  flex: 1;
   padding: 10px;
   font-size: 1rem;
 }
 
 /* ✅ Buttons */
 button {
-  display: inline-flex; /* ✅ Inline + Flex for centering */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
@@ -91,45 +92,43 @@ button:hover {
   background-color: #f0f0f0;
 }
 
-/* ✅ Category Buttons Full Width */
-.category-grid {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: 0;
-  margin: 0;
-}
-
-.category-card {
+/* ✅ Combined Style for Both Category & Recipe Cards */
+.category-card, .recipe-card {
   display: flex;
   align-items: center;
-  justify-content: center; /* ✅ Keep text centered when NOT in edit mode */
+  justify-content: center;
   background: #fff;
   padding: 20px;
-  border-radius: 0;
+  border-radius: 0; /* ✅ No rounded corners */
   border-bottom: 1px solid #ddd;
   text-align: center;
   cursor: pointer;
   width: 100%;
-  max-width: 100%;
   font-size: 1.2rem;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   margin: 0;
-  position: relative; /* ✅ For positioning delete button */
 }
 
-.category-card span {
+/* ✅ Text inside cards */
+.category-card span, .recipe-card span {
   flex: 1;
-  text-align: center; /* ✅ Ensure category text is centered */
+  text-align: center;
 }
 
-/* ✅ Edit Mode for Category Buttons */
+/* ✅ Remove border on last item in list or grid */
+.category-card:last-child, .recipe-card:last-child {
+  border-bottom: none;
+}
+
+/* ✅ Edit Mode for Categories */
 .category-card.edit-mode {
   justify-content: space-between;
 }
 
 .category-card button.delete-btn {
   position: absolute;
-  right: 10px; /* ✅ Stick to the far right */
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -138,25 +137,6 @@ button:hover {
   font-size: 1.2rem;
   cursor: pointer;
   padding: 0;
-}
-
-/* ✅ Remove border on last category */
-.category-card:last-child {
-  border-bottom: none;
-}
-
-/* ✅ Recipe cards for grid pages */
-.recipe-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  text-align: center;
-  cursor: pointer;
-  font-size: 1.1rem;
 }
 
 /* ✅ Print-Friendly */
