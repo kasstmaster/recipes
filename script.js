@@ -79,7 +79,6 @@ async function loadRecipes() {
   const titleEl = document.getElementById("category-title");
   if (!titleEl) return;
 
-  // ✅ Show category name
   titleEl.innerText = formatCategory(category);
 
   await fetchRecipes();
@@ -94,7 +93,7 @@ async function loadRecipes() {
         card.innerHTML = `<span>${recipe.title}</span>`;
 
         if (editMode) {
-          card.style.justifyContent = "space-between"; // Align buttons
+          card.style.justifyContent = "space-between";
 
           const editBtn = document.createElement("button");
           editBtn.textContent = "Edit";
@@ -109,16 +108,14 @@ async function loadRecipes() {
           deleteBtn.onclick = (e) => {
             e.stopPropagation();
             recipes.splice(index, 1);
-            display(); // Re-render
+            display();
           };
 
           card.appendChild(editBtn);
           card.appendChild(deleteBtn);
         } else {
-          // Normal navigation
-          card.onclick = () => {
+          card.onclick = () =>
             window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`;
-          };
         }
 
         container.appendChild(card);
@@ -126,7 +123,6 @@ async function loadRecipes() {
     });
   }
 
-  // ✅ Initial display
   display();
 
   // ✅ Search filter
@@ -137,7 +133,7 @@ async function loadRecipes() {
       container.innerHTML = "";
       recipes
         .filter(r => r.title.toLowerCase().includes(term) && r.category.toLowerCase() === category.toLowerCase())
-        .forEach((recipe, index) => {
+        .forEach((recipe) => {
           const card = document.createElement("div");
           card.className = "recipe-card";
           card.innerHTML = `<span>${recipe.title}</span>`;
@@ -153,7 +149,7 @@ async function loadRecipes() {
       editMode = !editMode;
       document.getElementById("editPanel").style.display = editMode ? "block" : "none";
       toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Recipes";
-      display(); // ✅ Refresh list immediately
+      display();
     });
   }
 
