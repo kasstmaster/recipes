@@ -18,15 +18,24 @@ async function fetchRecipes() {
 }
 
 /* -------------------------------
+   Highlight Function
+--------------------------------- */
+function highlight(text, term) {
+  if (!term) return text;
+  const regex = new RegExp(`(${term})`, "gi");
+  return text.replace(regex, "<mark>$1</mark>");
+}
+
+/* -------------------------------
    ALL RECIPES HOMEPAGE
 --------------------------------- */
 async function loadAllRecipes() {
   await fetchRecipes();
   const container = document.getElementById("all-recipe-list");
 
-  function display() {
+  function display(filtered = recipes, searchTerm = "") {
     container.innerHTML = "";
-    recipes.forEach((recipe, index) => {
+    filtered.forEach((recipe, index) => {
       const card = document.createElement("div");
       card.className = "recipe-card";
 
@@ -38,13 +47,13 @@ async function loadAllRecipes() {
       infoContainer.style.textAlign = "left";
 
       const titleEl = document.createElement("strong");
-      titleEl.textContent = recipe.title;
+      titleEl.innerHTML = highlight(recipe.title, searchTerm);
 
       const categoryEl = document.createElement("span");
-      categoryEl.textContent = `Category: ${recipe.category || "N/A"}`;
+      categoryEl.innerHTML = `Category: ${highlight(recipe.category || "N/A", searchTerm)}`;
 
       const codeEl = document.createElement("span");
-      codeEl.textContent = `Code: ${recipe.code || "N/A"}`;
+      codeEl.innerHTML = `Code: ${highlight(recipe.code || "N/A", searchTerm)}`;
 
       infoContainer.appendChild(titleEl);
       infoContainer.appendChild(categoryEl);
@@ -61,7 +70,7 @@ async function loadAllRecipes() {
         editBtn.textContent = "Edit";
         editBtn.onclick = (e) => {
           e.stopPropagation();
-          editRecipe(index, display);
+          editRecipe(index, () => display(filtered, searchTerm));
         };
 
         const deleteBtn = document.createElement("button");
@@ -70,7 +79,7 @@ async function loadAllRecipes() {
         deleteBtn.onclick = (e) => {
           e.stopPropagation();
           recipes.splice(index, 1);
-          display();
+          display(filtered, searchTerm);
         };
 
         btnContainer.appendChild(editBtn);
@@ -87,53 +96,24 @@ async function loadAllRecipes() {
   }
 
   display();
-  attachCommonEvents(display, container, "searchAll");
+  attachCommonEvents(display);
 }
 
 /* -------------------------------
    COMMON EVENTS: Search, Toggle Edit, Add Recipe
 --------------------------------- */
-function attachCommonEvents(display, container, searchId) {
-  // ✅ Search Filter (title, category, or code)
-  const searchInput = document.getElementById(searchId);
+function attachCommonEvents(display) {
+  // ✅ Search Filter (title, category, or code with highlight)
+  const searchInput = document.getElementById("searchAll");
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       const term = e.target.value.toLowerCase();
-      container.innerHTML = "";
-      recipes
-        .filter(r =>
-          (r.title && r.title.toLowerCase().includes(term)) ||
-          (r.category && r.category.toLowerCase().includes(term)) ||
-          (r.code && r.code.toLowerCase().includes(term))
-        )
-        .forEach((recipe) => {
-          const card = document.createElement("div");
-          card.className = "recipe-card";
-
-          const infoContainer = document.createElement("div");
-          infoContainer.style.flex = "1";
-          infoContainer.style.display = "flex";
-          infoContainer.style.flexDirection = "column";
-
-          const titleEl = document.createElement("strong");
-          titleEl.textContent = recipe.title;
-
-          const categoryEl = document.createElement("span");
-          categoryEl.textContent = `Category: ${recipe.category || "N/A"}`;
-
-          const codeEl = document.createElement("span");
-          codeEl.textContent = `Code: ${recipe.code || "N/A"}`;
-
-          infoContainer.appendChild(titleEl);
-          infoContainer.appendChild(categoryEl);
-          infoContainer.appendChild(codeEl);
-          card.appendChild(infoContainer);
-
-          card.onclick = () =>
-            (window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`);
-
-          container.appendChild(card);
-        });
+      const filtered = recipes.filter(r =>
+        (r.title && r.title.toLowerCase().includes(term)) ||
+        (r.category && r.category.toLowerCase().includes(term)) ||
+        (r.code && r.code.toLowerCase().includes(term))
+      );
+      display(filtered, term);
     });
   }
 
