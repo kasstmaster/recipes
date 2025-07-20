@@ -10,24 +10,31 @@
 <body>
 <header>
   <h1>Raudman Recipes</h1>
-  <button id="toggleEditModeBtn" style="margin:20px; padding:10px;">Edit Categories</button>
-  <button onclick="window.location.href='all-recipes.html'" style="margin:20px; padding:10px;">View All Recipes</button>
+  <div>
+    <button id="toggleEditModeBtn" style="margin:10px; padding:10px;">Edit Recipes</button>
+  </div>
+  <input type="text" id="searchAll" placeholder="Search all recipes..." style="margin:15px auto; display:block; width:80%; padding:10px;">
 </header>
 
 <main>
-  <div id="editPanel" style="display:none; margin: 20px;">
-    <form id="addCategoryForm" style="display:flex; gap:10px; align-items:center;">
-      <input type="text" id="newCategory" placeholder="New Category" required>
-      <button type="submit">Add</button>
+  <div id="all-recipe-list" class="recipe-grid"></div>
+
+  <!-- ✅ Edit Panel -->
+  <div id="editPanel" style="display:none; margin:20px;">
+    <h2>Edit Mode Active</h2>
+    <form id="addRecipeForm" style="display:flex; gap:10px; flex-wrap:wrap;">
+      <input type="text" id="newRecipeTitle" placeholder="Recipe Title" required>
+      <input type="text" id="newRecipeCategory" placeholder="Category" required>
+      <button type="submit">Add Recipe</button>
     </form>
   </div>
-  <div id="category-list" class="category-grid"></div>
 </main>
-
 
 <script src="script.js"></script>
 <script>
-  loadCategories();
+  document.addEventListener("DOMContentLoaded", () => {
+    loadAllRecipes(); // ✅ Uses the new function from updated script.js
+  });
 </script>
 </body>
 </html>
