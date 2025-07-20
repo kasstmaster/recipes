@@ -20,6 +20,7 @@
 <main>
   <div id="recipe-list" class="recipe-grid"></div>
 
+  <!-- ✅ Edit Panel (only visible in Edit Mode) -->
   <div id="editPanel" style="display:none; margin:20px;">
     <h2>Edit Mode Active</h2>
     <form id="addRecipeForm">
@@ -32,9 +33,12 @@
   </div>
 </main>
 
+<!-- ✅ Scripts at the bottom so DOM loads first -->
 <script src="script.js"></script>
 <script>
-  loadRecipes();
+  document.addEventListener("DOMContentLoaded", () => {
+    loadRecipes(); // ✅ Now runs after DOM is ready
+  });
 </script>
 </body>
 </html>
