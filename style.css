@@ -58,6 +58,7 @@ h1 {
   font-size: 1rem;
 }
 
+/* ✅ Add Category Form */
 #addCategoryForm {
   display: flex;
   flex-direction: row;
@@ -70,7 +71,6 @@ h1 {
   padding: 10px;
   font-size: 1rem;
 }
-
 
 /* ✅ Buttons */
 button {
@@ -103,19 +103,44 @@ button:hover {
 .category-card {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; /* ✅ Keep text centered when NOT in edit mode */
   background: #fff;
   padding: 20px;
-  border-radius: 0; /* ✅ Flat edges for stacked look */
-  border-bottom: 1px solid #ddd; /* ✅ Divider between buttons */
+  border-radius: 0;
+  border-bottom: 1px solid #ddd;
   text-align: center;
   cursor: pointer;
   width: 100%;
-  max-width: 100vw;
+  max-width: 100%;
   font-size: 1.2rem;
   margin: 0;
+  position: relative; /* ✅ For positioning delete button */
 }
 
+.category-card span {
+  flex: 1;
+  text-align: center; /* ✅ Ensure category text is centered */
+}
+
+/* ✅ Edit Mode for Category Buttons */
+.category-card.edit-mode {
+  justify-content: space-between;
+}
+
+.category-card button.delete-btn {
+  position: absolute;
+  right: 10px; /* ✅ Stick to the far right */
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #c00;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ✅ Remove border on last category */
 .category-card:last-child {
   border-bottom: none;
 }
