@@ -19,6 +19,15 @@
 
 <main>
   <div id="all-recipe-list" class="recipe-grid"></div>
+  
+    <!-- ✅ Edit Panel (only visible in Edit Mode) -->
+  <div id="editPanel" style="display:none; margin:20px;">
+    <form id="addRecipeForm">
+      <input type="text" id="newRecipeTitle" placeholder="Recipe Title" required>
+      <input type="text" id="newRecipeCategory" placeholder="Category" required>
+      <button type="submit">Add</button>
+    </form>
+  </div>
 </main>
 
 <script src="script.js"></script>
