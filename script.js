@@ -21,9 +21,9 @@ let categoryList = [
 function formatCategory(name) {
   return name
     .toLowerCase()
-    .split(' ')
+    .split(" ")
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .join(" ");
 }
 
 // ✅ Fetch recipes from JSON
@@ -84,6 +84,7 @@ async function loadRecipes() {
   await fetchRecipes();
   const container = document.getElementById("recipe-list");
 
+  // ✅ Internal function to render recipe cards
   function display() {
     container.innerHTML = "";
     recipes.forEach((recipe, index) => {
@@ -115,7 +116,7 @@ async function loadRecipes() {
           card.appendChild(deleteBtn);
         } else {
           card.onclick = () =>
-            window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`;
+            (window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`);
         }
 
         container.appendChild(card);
@@ -142,14 +143,14 @@ async function loadRecipes() {
     });
   }
 
-  // ✅ Toggle Edit Mode
+  // ✅ Toggle Edit Mode (Fixed)
   const toggleBtn = document.getElementById("toggleEditModeBtn");
   if (toggleBtn) {
     toggleBtn.addEventListener("click", () => {
       editMode = !editMode;
       document.getElementById("editPanel").style.display = editMode ? "block" : "none";
       toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Recipes";
-      display();
+      display(); // ✅ Refresh recipe cards to show/hide buttons
     });
   }
 
