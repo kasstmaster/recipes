@@ -30,7 +30,7 @@ async function loadAllRecipes() {
       const card = document.createElement("div");
       card.className = "recipe-card";
 
-      // ✅ Info section: Title + optional category/code
+      // ✅ Info section: Title + Category + Code
       const infoContainer = document.createElement("div");
       infoContainer.style.flex = "1";
       infoContainer.style.display = "flex";
