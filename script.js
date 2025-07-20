@@ -2,30 +2,6 @@ let editMode = false;
 let recipes = [];
 const dataPath = "../data/recipes.json";
 
-// ✅ Global category list for homepage
-let categoryList = [
-  "BREAKFAST",
-  "LUNCH",
-  "DINNER",
-  "SIDE DISHES",
-  "APPETIZERS & SNACKS",
-  "DESSERTS",
-  "DRINKS",
-  "ALCOHOL DRINKS",
-  "CHILDREN’S",
-  "HOMEMADE INGREDIENTS",
-  "HOW-TO & TECHNIQUES"
-];
-
-// ✅ Helper: Format category names in Title Case
-function formatCategory(name) {
-  return name
-    .toLowerCase()
-    .split(" ")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
 // ✅ Fetch recipes from JSON
 async function fetchRecipes() {
   const response = await fetch(dataPath);
@@ -33,41 +9,13 @@ async function fetchRecipes() {
   return recipes;
 }
 
-/* -------------------------------
-   HOMEPAGE: LOAD CATEGORIES
---------------------------------- */
-function loadCategories() {
-  const container = document.getElementById("category-list");
-  if (!container) return;
-  container.innerHTML = "";
-
-  categoryList.forEach((cat, index) => {
-    const card = document.createElement("div");
-    card.className = "category-card";
-
-    const span = document.createElement("span");
-    span.textContent = formatCategory(cat);
-    card.appendChild(span);
-
-    if (editMode) {
-      card.classList.add("edit-mode");
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.className = "delete-btn";
-      deleteBtn.textContent = "✖";
-      deleteBtn.onclick = () => {
-        categoryList.splice(index, 1);
-        loadCategories();
-      };
-      card.appendChild(deleteBtn);
-    } else {
-      card.classList.remove("edit-mode");
-      card.onclick = () =>
-        (window.location.href = `recipes.html?category=${encodeURIComponent(cat)}`);
-    }
-
-    container.appendChild(card);
-  });
+// ✅ Format category names
+function formatCategory(name) {
+  return name
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 /* -------------------------------
@@ -84,7 +32,7 @@ async function loadRecipes() {
   await fetchRecipes();
   const container = document.getElementById("recipe-list");
 
-  // ✅ Internal function to render recipe cards
+  // ✅ Function to display recipes
   function display() {
     container.innerHTML = "";
     recipes.forEach((recipe, index) => {
@@ -143,14 +91,14 @@ async function loadRecipes() {
     });
   }
 
-  // ✅ Toggle Edit Mode (Fixed)
+  // ✅ Toggle Edit Mode
   const toggleBtn = document.getElementById("toggleEditModeBtn");
   if (toggleBtn) {
     toggleBtn.addEventListener("click", () => {
       editMode = !editMode;
       document.getElementById("editPanel").style.display = editMode ? "block" : "none";
       toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Recipes";
-      display(); // ✅ Refresh recipe cards to show/hide buttons
+      display(); // ✅ Refresh cards immediately
     });
   }
 
@@ -191,35 +139,6 @@ async function loadRecipes() {
 }
 
 /* -------------------------------
-   RECIPE PAGE: LOAD SINGLE RECIPE
---------------------------------- */
-async function loadRecipeDetails() {
-  const params = new URLSearchParams(window.location.search);
-  const title = params.get("title");
-  await fetchRecipes();
-  const recipe = recipes.find(r => r.title === title);
-
-  if (recipe) {
-    const container = document.getElementById("recipe-details");
-    document.getElementById("recipe-title").innerText = recipe.title;
-    container.innerHTML = `
-      ${recipe.photo ? `<img src="../data/${recipe.photo}" alt="${recipe.title}" style="max-width:100%; margin-bottom:10px;">` : ""}
-      <h2>Ingredients</h2>
-      <ul>${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
-      <h2>Instructions</h2>
-      <ol>${recipe.instructions.map(s => `<li>${s}</li>`).join('')}</ol>
-      ${recipe.notes ? `<p><strong>Notes:</strong> ${recipe.notes}</p>` : ""}
-      ${recipe.story ? `<p><em>${recipe.story}</em></p>` : ""}
-    `;
-  }
-
-  const printBtn = document.getElementById("printBtn");
-  if (printBtn) {
-    printBtn.addEventListener("click", () => window.print());
-  }
-}
-
-/* -------------------------------
    EDIT RECIPE FUNCTION
 --------------------------------- */
 function editRecipe(index) {
@@ -231,44 +150,3 @@ function editRecipe(index) {
     loadRecipes();
   }
 }
-
-/* -------------------------------
-   HOMEPAGE EVENTS
---------------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("category-list")) {
-    const toggleBtn = document.getElementById("toggleEditModeBtn");
-    if (toggleBtn) {
-      toggleBtn.addEventListener("click", () => {
-        editMode = !editMode;
-        document.getElementById("editPanel").style.display = editMode ? "block" : "none";
-        toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Categories";
-        loadCategories();
-      });
-    }
-
-    const addForm = document.getElementById("addCategoryForm");
-    if (addForm) {
-      addForm.addEventListener("submit", e => {
-        e.preventDefault();
-        const newCat = document.getElementById("newCategory").value.trim();
-        if (newCat && !categoryList.includes(newCat.toUpperCase())) {
-          categoryList.push(newCat.toUpperCase());
-          document.getElementById("newCategory").value = "";
-          loadCategories();
-        }
-      });
-    }
-
-    const exportBtn = document.getElementById("exportBtn");
-    if (exportBtn) {
-      exportBtn.addEventListener("click", () => {
-        const exportArea = document.getElementById("exportData");
-        exportArea.style.display = "block";
-        exportArea.value = JSON.stringify({ categories: categoryList }, null, 2);
-      });
-    }
-
-    loadCategories();
-  }
-});
