@@ -1,33 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Raudman Recipes</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-</head>
-<body>
-<header>
-  <h1>Raudman Recipes</h1>
-  <button id="toggleEditModeBtn" style="margin:20px; padding:10px;">Edit Categories</button>
-  <button onclick="window.location.href='all-recipes.html'" style="margin:20px; padding:10px;">View All Recipes</button>
-</header>
+/* -------------------------------
+   HOMEPAGE: LOAD CATEGORIES
+--------------------------------- */
+let categoryList = [
+  "BREAKFAST",
+  "LUNCH",
+  "DINNER",
+  "SIDE DISHES",
+  "APPETIZERS & SNACKS",
+  "DESSERTS",
+  "DRINKS",
+  "ALCOHOL DRINKS",
+  "CHILDREN’S",
+  "HOMEMADE INGREDIENTS",
+  "HOW-TO & TECHNIQUES"
+];
 
-<main>
-  <div id="editPanel" style="display:none; margin: 20px;">
-    <form id="addCategoryForm" style="display:flex; gap:10px; align-items:center;">
-      <input type="text" id="newCategory" placeholder="New Category" required>
-      <button type="submit">Add</button>
-    </form>
-  </div>
-  <div id="category-list" class="category-grid"></div>
-</main>
+function loadCategories() {
+  const container = document.getElementById("category-list");
+  if (!container) return;
 
+  container.innerHTML = "";
+  categoryList.forEach((cat, index) => {
+    const card = document.createElement("div");
+    card.className = "category-card";
+    card.textContent = cat;
 
-<script src="script.js"></script>
-<script>
-  loadCategories();
-</script>
-</body>
-</html>
+    if (editMode) {
+      card.style.justifyContent = "space-between";
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "✖";
+      deleteBtn.className = "delete-btn";
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        categoryList.splice(index, 1);
+        loadCategories();
+      };
+
+      card.appendChild(deleteBtn);
+    } else {
+      card.onclick = () => {
+        window.location.href = `category.html?category=${encodeURIComponent(cat)}`;
+      };
+    }
+
+    container.appendChild(card);
+  });
+}
+
+// ✅ Toggle Edit Mode for Categories
+const toggleBtn = document.getElementById("toggleEditModeBtn");
+if (toggleBtn) {
+  toggleBtn.addEventListener("click", () => {
+    editMode = !editMode;
+    document.getElementById("editPanel").style.display = editMode ? "block" : "none";
+    toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Categories";
+    loadCategories();
+  });
+}
+
+// ✅ Add Category
+const addForm = document.getElementById("addCategoryForm");
+if (addForm) {
+  addForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const newCategory = document.getElementById("newCategory").value.trim();
+    if (newCategory) {
+      categoryList.push(newCategory.toUpperCase());
+      document.getElementById("newCategory").value = "";
+      loadCategories();
+    }
+  });
+}
