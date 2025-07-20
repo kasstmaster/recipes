@@ -1,15 +1,11 @@
 let editMode = false;
 let recipes = [];
-const dataPath = "data/recipes.json";
-
-// ✅ Detect Page Type
-const isHomepage = document.getElementById("category-list") !== null;
-const isCategoryPage = document.getElementById("category-title") !== null;
+const dataPath = "data/recipes.json"; // ✅ Adjust path if needed
 
 /* -------------------------------
    HOMEPAGE: LOAD CATEGORIES
 --------------------------------- */
-let categoryList = JSON.parse(localStorage.getItem("categories")) || [
+let categoryList = [
   "BREAKFAST",
   "LUNCH",
   "DINNER",
@@ -42,7 +38,6 @@ function loadCategories() {
       deleteBtn.onclick = (e) => {
         e.stopPropagation();
         categoryList.splice(index, 1);
-        saveCategories();
         loadCategories();
       };
 
@@ -57,44 +52,40 @@ function loadCategories() {
   });
 }
 
-function saveCategories() {
-  localStorage.setItem("categories", JSON.stringify(categoryList));
-}
-
-// ✅ Homepage Init
-if (isHomepage) {
-  const toggleBtn = document.getElementById("toggleEditModeBtn");
+// ✅ Toggle Edit Mode for Categories
+const toggleBtn = document.getElementById("toggleEditModeBtn");
+if (toggleBtn) {
   toggleBtn.addEventListener("click", () => {
     editMode = !editMode;
     document.getElementById("editPanel").style.display = editMode ? "block" : "none";
     toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Categories";
     loadCategories();
   });
+}
 
-  const addForm = document.getElementById("addCategoryForm");
+// ✅ Add Category
+const addForm = document.getElementById("addCategoryForm");
+if (addForm) {
   addForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const newCategory = document.getElementById("newCategory").value.trim();
     if (newCategory) {
       categoryList.push(newCategory.toUpperCase());
-      saveCategories();
       document.getElementById("newCategory").value = "";
       loadCategories();
     }
   });
-
-  loadCategories();
 }
 
-/* -------------------------------
-   CATEGORY PAGE: RECIPES
---------------------------------- */
+
+// ✅ Fetch recipes from JSON
 async function fetchRecipes() {
   const response = await fetch(dataPath);
   recipes = await response.json();
   return recipes;
 }
 
+// ✅ Format category names
 function formatCategory(name) {
   return name
     .toLowerCase()
@@ -103,19 +94,21 @@ function formatCategory(name) {
     .join(' ');
 }
 
-if (isCategoryPage) {
-  loadRecipes();
-}
-
+/* -------------------------------
+   CATEGORY PAGE: LOAD RECIPES
+--------------------------------- */
 async function loadRecipes() {
   const params = new URLSearchParams(window.location.search);
   const category = params.get("category");
   const titleEl = document.getElementById("category-title");
+  if (!titleEl) return;
+
   titleEl.innerText = formatCategory(category);
 
   await fetchRecipes();
   const container = document.getElementById("recipe-list");
 
+  // ✅ Function to display recipes
   function display() {
     container.innerHTML = "";
     recipes.forEach((recipe, index) => {
@@ -131,7 +124,7 @@ async function loadRecipes() {
           editBtn.textContent = "Edit";
           editBtn.onclick = (e) => {
             e.stopPropagation();
-            editRecipe(index, display);
+            editRecipe(index, display); // ✅ Pass display function
           };
 
           const deleteBtn = document.createElement("button");
@@ -157,6 +150,7 @@ async function loadRecipes() {
 
   display();
 
+  // ✅ Search filter
   const searchInput = document.getElementById("search");
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
@@ -173,14 +167,18 @@ async function loadRecipes() {
     });
   }
 
+  // ✅ Toggle Edit Mode
   const toggleBtn = document.getElementById("toggleEditModeBtn");
-  toggleBtn.addEventListener("click", () => {
-    editMode = !editMode;
-    document.getElementById("editPanel").style.display = editMode ? "block" : "none";
-    toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Recipes";
-    display();
-  });
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      editMode = !editMode;
+      document.getElementById("editPanel").style.display = editMode ? "block" : "none";
+      toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Recipes";
+      display(); // ✅ Refresh cards immediately
+    });
+  }
 
+  // ✅ Add new recipe
   const addForm = document.getElementById("addRecipeForm");
   if (addForm) {
     addForm.addEventListener("submit", (e) => {
@@ -205,6 +203,7 @@ async function loadRecipes() {
     });
   }
 
+  // ✅ Export JSON
   const exportBtn = document.getElementById("exportBtn");
   if (exportBtn) {
     exportBtn.addEventListener("click", () => {
@@ -215,12 +214,15 @@ async function loadRecipes() {
   }
 }
 
+/* -------------------------------
+   EDIT RECIPE FUNCTION
+--------------------------------- */
 function editRecipe(index, displayCallback) {
   const newTitle = prompt("Enter new title:", recipes[index].title);
   const newCategory = prompt("Enter new category:", recipes[index].category);
   if (newTitle && newCategory) {
     recipes[index].title = newTitle.trim();
     recipes[index].category = newCategory.trim();
-    displayCallback();
+    displayCallback(); // ✅ Re-render without reloading everything
   }
 }
