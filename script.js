@@ -1,32 +1,10 @@
 let editMode = false;
 let recipes = [];
-const dataPath = "recipes.json"; // ✅ Path is correct for your structure
+const dataPath = "recipes.json"; // Path for your structure
 
-// ✅ Global category list for homepage
-let categoryList = [
-  "BREAKFAST",
-  "LUNCH",
-  "DINNER",
-  "SIDE DISHES",
-  "APPETIZERS & SNACKS",
-  "DESSERTS",
-  "DRINKS",
-  "ALCOHOL DRINKS",
-  "CHILDREN’S",
-  "HOMEMADE INGREDIENTS",
-  "HOW-TO & TECHNIQUES"
-];
-
-// ✅ Helper: Format category names in Title Case
-function formatCategory(name) {
-  return name
-    .toLowerCase()
-    .split(" ")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-// ✅ Fetch recipes from JSON
+/* -------------------------------
+   Fetch Recipes
+--------------------------------- */
 async function fetchRecipes() {
   try {
     const response = await fetch(dataPath);
@@ -34,105 +12,13 @@ async function fetchRecipes() {
     recipes = await response.json();
   } catch (err) {
     console.error("Error fetching recipes:", err);
-    recipes = []; // ✅ Fallback to empty list
+    recipes = [];
   }
   return recipes;
 }
 
 /* -------------------------------
-   HOMEPAGE: LOAD CATEGORIES
---------------------------------- */
-function loadCategories() {
-  const container = document.getElementById("category-list");
-  if (!container) return;
-  container.innerHTML = "";
-
-  categoryList.forEach((cat, index) => {
-    const card = document.createElement("div");
-    card.className = "category-card";
-
-    const span = document.createElement("span");
-    span.textContent = formatCategory(cat);
-    card.appendChild(span);
-
-    if (editMode) {
-      card.classList.add("edit-mode");
-      const deleteBtn = document.createElement("button");
-      deleteBtn.className = "delete-btn";
-      deleteBtn.textContent = "✖";
-      deleteBtn.onclick = () => {
-        categoryList.splice(index, 1);
-        loadCategories();
-      };
-      card.appendChild(deleteBtn);
-    } else {
-      card.onclick = () =>
-        (window.location.href = `recipes.html?category=${encodeURIComponent(cat)}`);
-    }
-
-    container.appendChild(card);
-  });
-}
-
-/* -------------------------------
-   CATEGORY PAGE: LOAD RECIPES
---------------------------------- */
-async function loadRecipes() {
-  const params = new URLSearchParams(window.location.search);
-  const category = params.get("category");
-  const titleEl = document.getElementById("category-title");
-  if (!titleEl) return;
-
-  titleEl.innerText = formatCategory(category);
-
-  await fetchRecipes();
-  const container = document.getElementById("recipe-list");
-
-  function display() {
-    container.innerHTML = "";
-    recipes.forEach((recipe, index) => {
-      if (recipe.category && recipe.category.toLowerCase() === category.toLowerCase()) {
-        const card = document.createElement("div");
-        card.className = "recipe-card";
-        card.innerHTML = `<span>${recipe.title}</span>`;
-
-        if (editMode) {
-          card.style.justifyContent = "space-between";
-
-          const editBtn = document.createElement("button");
-          editBtn.textContent = "Edit";
-          editBtn.onclick = (e) => {
-            e.stopPropagation();
-            editRecipe(index, display);
-          };
-
-          const deleteBtn = document.createElement("button");
-          deleteBtn.textContent = "✖";
-          deleteBtn.className = "delete-btn";
-          deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            recipes.splice(index, 1);
-            display();
-          };
-
-          card.appendChild(editBtn);
-          card.appendChild(deleteBtn);
-        } else {
-          card.onclick = () =>
-            (window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`);
-        }
-
-        container.appendChild(card);
-      }
-    });
-  }
-
-  display();
-  attachCommonEvents(display, container, "search");
-}
-
-/* -------------------------------
-   ALL RECIPES PAGE
+   ALL RECIPES HOMEPAGE
 --------------------------------- */
 async function loadAllRecipes() {
   await fetchRecipes();
@@ -180,9 +66,10 @@ async function loadAllRecipes() {
 }
 
 /* -------------------------------
-   COMMON EVENTS (Search + Toggle + Add)
+   COMMON EVENTS: Search, Toggle Edit, Add Recipe
 --------------------------------- */
 function attachCommonEvents(display, container, searchId) {
+  // ✅ Search Filter
   const searchInput = document.getElementById(searchId);
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
@@ -194,11 +81,14 @@ function attachCommonEvents(display, container, searchId) {
           const card = document.createElement("div");
           card.className = "recipe-card";
           card.innerHTML = `<span>${recipe.title}</span>`;
+          card.onclick = () =>
+            (window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`);
           container.appendChild(card);
         });
     });
   }
 
+  // ✅ Toggle Edit Mode
   const toggleBtn = document.getElementById("toggleEditModeBtn");
   if (toggleBtn) {
     toggleBtn.addEventListener("click", () => {
@@ -209,25 +99,24 @@ function attachCommonEvents(display, container, searchId) {
     });
   }
 
+  // ✅ Add Recipe
   const addForm = document.getElementById("addRecipeForm");
   if (addForm) {
     addForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const title = document.getElementById("newRecipeTitle").value.trim();
-      const cat = document.getElementById("newRecipeCategory").value.trim();
-      if (title && cat) {
+      if (title) {
         recipes.push({
           title,
-          category: cat,
           ingredients: [],
           instructions: [],
           notes: "",
           story: "",
           photo: "",
-          tags: []
+          tags: [],
+          date_added: new Date().toISOString().split("T")[0]
         });
         document.getElementById("newRecipeTitle").value = "";
-        document.getElementById("newRecipeCategory").value = "";
         display();
       }
     });
@@ -235,20 +124,18 @@ function attachCommonEvents(display, container, searchId) {
 }
 
 /* -------------------------------
-   EDIT RECIPE FUNCTION
+   Edit Recipe Function
 --------------------------------- */
 function editRecipe(index, callback) {
   const newTitle = prompt("Enter new title:", recipes[index].title);
-  const newCategory = prompt("Enter new category:", recipes[index].category);
-  if (newTitle && newCategory) {
+  if (newTitle) {
     recipes[index].title = newTitle.trim();
-    recipes[index].category = newCategory.trim();
-    callback(); // ✅ Keeps Edit Mode ON
+    callback();
   }
 }
 
 /* -------------------------------
-   RECIPE PAGE
+   Recipe Detail Page
 --------------------------------- */
 async function loadRecipeDetails() {
   const params = new URLSearchParams(window.location.search);
@@ -275,35 +162,3 @@ async function loadRecipeDetails() {
     printBtn.addEventListener("click", () => window.print());
   }
 }
-
-/* -------------------------------
-   HOMEPAGE EVENTS
---------------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("category-list")) {
-    const toggleBtn = document.getElementById("toggleEditModeBtn");
-    if (toggleBtn) {
-      toggleBtn.addEventListener("click", () => {
-        editMode = !editMode;
-        document.getElementById("editPanel").style.display = editMode ? "block" : "none";
-        toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Categories";
-        loadCategories();
-      });
-    }
-
-    const addForm = document.getElementById("addCategoryForm");
-    if (addForm) {
-      addForm.addEventListener("submit", e => {
-        e.preventDefault();
-        const newCat = document.getElementById("newCategory").value.trim();
-        if (newCat && !categoryList.includes(newCat.toUpperCase())) {
-          categoryList.push(newCat.toUpperCase());
-          document.getElementById("newCategory").value = "";
-          loadCategories();
-        }
-      });
-    }
-
-    loadCategories();
-  }
-});
