@@ -44,19 +44,30 @@ function loadCategories() {
   categoryList.forEach((cat, index) => {
     const card = document.createElement("div");
     card.className = "category-card";
-    card.innerHTML = `<span>${formatCategory(cat)}</span>`; // ✅ Title Case for display
 
+    // ✅ Add category text
+    const span = document.createElement("span");
+    span.textContent = formatCategory(cat);
+    card.appendChild(span);
+
+    // ✅ Add or remove edit-mode class
     if (editMode) {
+      card.classList.add("edit-mode");
+
+      // Add delete button
       const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-btn";
       deleteBtn.textContent = "✖";
-      deleteBtn.style.marginLeft = "10px";
       deleteBtn.onclick = () => {
         categoryList.splice(index, 1);
         loadCategories();
       };
       card.appendChild(deleteBtn);
     } else {
-      card.onclick = () => window.location.href = `recipes.html?category=${encodeURIComponent(cat)}`;
+      card.classList.remove("edit-mode");
+      // ✅ Normal click to go to recipes
+      card.onclick = () =>
+        (window.location.href = `recipes.html?category=${encodeURIComponent(cat)}`);
     }
 
     container.appendChild(card);
