@@ -79,38 +79,46 @@ async function loadRecipes() {
   const titleEl = document.getElementById("category-title");
   if (!titleEl) return;
 
+  // ✅ Show category name
   titleEl.innerText = formatCategory(category);
 
   await fetchRecipes();
   const container = document.getElementById("recipe-list");
 
-  function display(list) {
+  function display() {
     container.innerHTML = "";
-    list.forEach((recipe, index) => {
+    recipes.forEach((recipe, index) => {
       if (recipe.category && recipe.category.toLowerCase() === category.toLowerCase()) {
         const card = document.createElement("div");
         card.className = "recipe-card";
         card.innerHTML = `<span>${recipe.title}</span>`;
 
         if (editMode) {
+          card.style.justifyContent = "space-between"; // Align buttons
+
           const editBtn = document.createElement("button");
           editBtn.textContent = "Edit";
-          editBtn.onclick = () => editRecipe(index);
-
-          const deleteBtn = document.createElement("button");
-          deleteBtn.className = "delete-btn";
-          deleteBtn.textContent = "✖";
-          deleteBtn.onclick = () => {
-            recipes.splice(index, 1);
-            display(recipes);
+          editBtn.onclick = (e) => {
+            e.stopPropagation();
+            editRecipe(index);
           };
 
-          card.style.justifyContent = "space-between";
+          const deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "✖";
+          deleteBtn.className = "delete-btn";
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            recipes.splice(index, 1);
+            display(); // Re-render
+          };
+
           card.appendChild(editBtn);
           card.appendChild(deleteBtn);
         } else {
-          card.onclick = () =>
+          // Normal navigation
+          card.onclick = () => {
             window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`;
+          };
         }
 
         container.appendChild(card);
@@ -118,14 +126,23 @@ async function loadRecipes() {
     });
   }
 
-  display(recipes);
+  // ✅ Initial display
+  display();
 
   // ✅ Search filter
   const searchInput = document.getElementById("search");
   if (searchInput) {
-    searchInput.addEventListener("input", e => {
+    searchInput.addEventListener("input", (e) => {
       const term = e.target.value.toLowerCase();
-      display(recipes.filter(r => r.title.toLowerCase().includes(term)));
+      container.innerHTML = "";
+      recipes
+        .filter(r => r.title.toLowerCase().includes(term) && r.category.toLowerCase() === category.toLowerCase())
+        .forEach((recipe, index) => {
+          const card = document.createElement("div");
+          card.className = "recipe-card";
+          card.innerHTML = `<span>${recipe.title}</span>`;
+          container.appendChild(card);
+        });
     });
   }
 
@@ -136,14 +153,14 @@ async function loadRecipes() {
       editMode = !editMode;
       document.getElementById("editPanel").style.display = editMode ? "block" : "none";
       toggleBtn.textContent = editMode ? "Exit Edit Mode" : "Edit Recipes";
-      display(recipes);
+      display(); // ✅ Refresh list immediately
     });
   }
 
-  // ✅ Add Recipe
+  // ✅ Add new recipe
   const addForm = document.getElementById("addRecipeForm");
   if (addForm) {
-    addForm.addEventListener("submit", e => {
+    addForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const title = document.getElementById("newRecipeTitle").value.trim();
       const cat = document.getElementById("newRecipeCategory").value.trim();
@@ -160,7 +177,7 @@ async function loadRecipes() {
         });
         document.getElementById("newRecipeTitle").value = "";
         document.getElementById("newRecipeCategory").value = "";
-        display(recipes);
+        display();
       }
     });
   }
