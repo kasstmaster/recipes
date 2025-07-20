@@ -72,6 +72,11 @@ h1 {
   font-size: 1rem;
 }
 
+#newRecipeCode {
+  padding: 10px;
+  font-size: 1rem;
+}
+
 /* ✅ Buttons */
 button {
   display: inline-flex;
