@@ -30,13 +30,29 @@ async function loadAllRecipes() {
       const card = document.createElement("div");
       card.className = "recipe-card";
 
-      // ✅ Title on the left
-      const titleSpan = document.createElement("span");
-      titleSpan.textContent = recipe.title;
-      card.appendChild(titleSpan);
+      // ✅ Info section: Title + optional category/code
+      const infoContainer = document.createElement("div");
+      infoContainer.style.flex = "1";
+      infoContainer.style.display = "flex";
+      infoContainer.style.flexDirection = "column";
+      infoContainer.style.textAlign = "left";
 
+      const titleEl = document.createElement("strong");
+      titleEl.textContent = recipe.title;
+
+      const categoryEl = document.createElement("span");
+      categoryEl.textContent = `Category: ${recipe.category || "N/A"}`;
+
+      const codeEl = document.createElement("span");
+      codeEl.textContent = `Code: ${recipe.code || "N/A"}`;
+
+      infoContainer.appendChild(titleEl);
+      infoContainer.appendChild(categoryEl);
+      infoContainer.appendChild(codeEl);
+      card.appendChild(infoContainer);
+
+      // ✅ Edit/Delete Buttons in Edit Mode
       if (editMode) {
-        // ✅ Buttons container on the far right
         const btnContainer = document.createElement("div");
         btnContainer.style.display = "flex";
         btnContainer.style.gap = "10px";
@@ -114,9 +130,14 @@ function attachCommonEvents(display, container, searchId) {
     addForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const title = document.getElementById("newRecipeTitle").value.trim();
+      const category = document.getElementById("newRecipeCategory").value.trim();
+      const code = document.getElementById("newRecipeCode").value.trim();
+
       if (title) {
         recipes.push({
           title,
+          category,
+          code,
           ingredients: [],
           instructions: [],
           notes: "",
@@ -125,7 +146,12 @@ function attachCommonEvents(display, container, searchId) {
           tags: [],
           date_added: new Date().toISOString().split("T")[0]
         });
+
+        // ✅ Clear inputs after adding
         document.getElementById("newRecipeTitle").value = "";
+        document.getElementById("newRecipeCategory").value = "";
+        document.getElementById("newRecipeCode").value = "";
+
         display();
       }
     });
@@ -137,10 +163,14 @@ function attachCommonEvents(display, container, searchId) {
 --------------------------------- */
 function editRecipe(index, callback) {
   const newTitle = prompt("Enter new title:", recipes[index].title);
-  if (newTitle) {
-    recipes[index].title = newTitle.trim();
-    callback();
-  }
+  const newCategory = prompt("Enter new category:", recipes[index].category || "");
+  const newCode = prompt("Enter new code:", recipes[index].code || "");
+
+  if (newTitle) recipes[index].title = newTitle.trim();
+  if (newCategory) recipes[index].category = newCategory.trim();
+  if (newCode) recipes[index].code = newCode.trim();
+
+  callback();
 }
 
 /* -------------------------------
@@ -157,6 +187,10 @@ async function loadRecipeDetails() {
     document.getElementById("recipe-title").innerText = recipe.title;
     container.innerHTML = `
       ${recipe.photo ? `<img src="${recipe.photo}" alt="${recipe.title}" style="max-width:100%; margin-bottom:10px;">` : ""}
+      <h2>Category:</h2>
+      <p>${recipe.category || "N/A"}</p>
+      <h2>Code:</h2>
+      <p>${recipe.code || "N/A"}</p>
       <h2>Ingredients</h2>
       <ul>${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
       <h2>Instructions</h2>
