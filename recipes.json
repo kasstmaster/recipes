@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Grandma's Apple Pie",
+    "author": "Grandma Jane",
+    "category": "Dessert",
+    "ingredients": [
+      "2 cups flour",
+      "1/2 cup sugar",
+      "4 apples, sliced"
+    ],
+    "instructions": [
+      "Preheat oven to 375°F.",
+      "Mix flour and sugar.",
+      "Add apples and bake for 45 mins."
+    ],
+    "notes": "Serve with vanilla ice cream.",
+    "story": "Grandma made this every Thanksgiving since 1960.",
+    "tags": ["Holiday", "Family Favorite"],
+    "photo": "media/apple-pie.jpg",
+    "date_added": "2025-07-18"
+  },
+  {
+    "title": "Dad's BBQ Ribs",
+    "author": "Dad",
+    "category": "Dinner",
+    "ingredients": [
+      "2 racks pork ribs",
+      "1 cup BBQ sauce",
+      "Salt and pepper"
+    ],
+    "instructions": [
+      "Season ribs with salt and pepper.",
+      "Bake at 300°F for 2 hours.",
+      "Brush with BBQ sauce and grill for 10 mins."
+    ],
+    "notes": "Best with cornbread.",
+    "story": "Dad made these every 4th of July.",
+    "tags": ["BBQ", "Holiday"],
+    "photo": "media/bbq-ribs.jpg",
+    "date_added": "2025-07-18"
+  }
+]
