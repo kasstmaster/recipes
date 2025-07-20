@@ -32,10 +32,9 @@ h1 {
 
 /* ✅ Recipe Grid */
 .recipe-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 /* ✅ Recipe Details Page */
