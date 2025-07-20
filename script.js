@@ -1,6 +1,6 @@
 let editMode = false;
 let recipes = [];
-const dataPath = "../data/recipes.json";
+const dataPath = "data/recipes.json"; // ✅ Adjust path if needed
 
 // ✅ Fetch recipes from JSON
 async function fetchRecipes() {
@@ -48,7 +48,7 @@ async function loadRecipes() {
           editBtn.textContent = "Edit";
           editBtn.onclick = (e) => {
             e.stopPropagation();
-            editRecipe(index);
+            editRecipe(index, display); // ✅ Pass display function
           };
 
           const deleteBtn = document.createElement("button");
@@ -141,12 +141,12 @@ async function loadRecipes() {
 /* -------------------------------
    EDIT RECIPE FUNCTION
 --------------------------------- */
-function editRecipe(index) {
+function editRecipe(index, displayCallback) {
   const newTitle = prompt("Enter new title:", recipes[index].title);
   const newCategory = prompt("Enter new category:", recipes[index].category);
   if (newTitle && newCategory) {
     recipes[index].title = newTitle.trim();
     recipes[index].category = newCategory.trim();
-    loadRecipes();
+    displayCallback(); // ✅ Re-render without reloading everything
   }
 }
