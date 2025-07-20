@@ -94,20 +94,44 @@ async function loadAllRecipes() {
    COMMON EVENTS: Search, Toggle Edit, Add Recipe
 --------------------------------- */
 function attachCommonEvents(display, container, searchId) {
-  // ✅ Search Filter
+  // ✅ Search Filter (title, category, or code)
   const searchInput = document.getElementById(searchId);
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       const term = e.target.value.toLowerCase();
       container.innerHTML = "";
       recipes
-        .filter(r => r.title.toLowerCase().includes(term))
+        .filter(r =>
+          (r.title && r.title.toLowerCase().includes(term)) ||
+          (r.category && r.category.toLowerCase().includes(term)) ||
+          (r.code && r.code.toLowerCase().includes(term))
+        )
         .forEach((recipe) => {
           const card = document.createElement("div");
           card.className = "recipe-card";
-          card.innerHTML = `<span>${recipe.title}</span>`;
+
+          const infoContainer = document.createElement("div");
+          infoContainer.style.flex = "1";
+          infoContainer.style.display = "flex";
+          infoContainer.style.flexDirection = "column";
+
+          const titleEl = document.createElement("strong");
+          titleEl.textContent = recipe.title;
+
+          const categoryEl = document.createElement("span");
+          categoryEl.textContent = `Category: ${recipe.category || "N/A"}`;
+
+          const codeEl = document.createElement("span");
+          codeEl.textContent = `Code: ${recipe.code || "N/A"}`;
+
+          infoContainer.appendChild(titleEl);
+          infoContainer.appendChild(categoryEl);
+          infoContainer.appendChild(codeEl);
+          card.appendChild(infoContainer);
+
           card.onclick = () =>
             (window.location.href = `recipe.html?title=${encodeURIComponent(recipe.title)}`);
+
           container.appendChild(card);
         });
     });
